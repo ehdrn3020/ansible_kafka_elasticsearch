@@ -3,7 +3,7 @@
 # ==============================================
 
 # Zookeeper version and cluster configuration
-zookeeper_version: "3.6.0"
+zookeeper_version: "3.7.2"
 zookeeper_home: "/rnd/zookeeper"
 zookeeper_data_dir: "{{ data_dir }}/zookeeper"
 zookeeper_log_dir: "{{ log_dir }}/zookeeper"
