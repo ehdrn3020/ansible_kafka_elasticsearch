@@ -7,7 +7,7 @@
   changed_when: false
 
 - name: Install Java 1.8.0 OpenJDK (CentOS/RHEL 7)
-  yum:
+  package:
     name:
       - java-1.8.0-openjdk
       - java-1.8.0-openjdk-devel
