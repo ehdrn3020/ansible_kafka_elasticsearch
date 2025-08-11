@@ -1,6 +1,6 @@
 ---
 - name: Apply common configuration to all hosts
-  hosts: kafka_cluster
+  hosts: server_cluster
   # become: yes # Removed as per user request
   tags:
     - common
