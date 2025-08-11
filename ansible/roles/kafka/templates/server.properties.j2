@@ -1,0 +1,20 @@
+# Server Basics
+broker.id={{ kafka_broker_id }}
+
+# Socket Server Settings
+listeners=PLAINTEXT://{{ inventory_hostname }}:{{ kafka_port }}
+advertised.listeners=PLAINTEXT://{{ inventory_hostname }}:{{ kafka_port }}
+
+# Log Basics
+log.dirs={{ data_dir }}/kafka
+
+# Log Retention Policy
+log.retention.hours=72
+log.retention.bytes=1073741824
+log.segment.bytes=1073741824
+log.retention.check.interval.ms=300000
+
+# Zookeeper
+zookeeper.connect={% for host in groups['zookeeper'] %}{{ inventory_hostname }}:{{ zookeeper_client_port }}{% if not loop.last %},{% endif %}{% endfor %}{{ zookeeper_connect_path }}
+
+zookeeper.connection.timeout.ms=6000

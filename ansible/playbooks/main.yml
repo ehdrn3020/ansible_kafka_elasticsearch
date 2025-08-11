@@ -1,0 +1,31 @@
+---
+- name: Apply common configuration to all hosts
+  hosts: kafka_cluster
+  # become: yes # Removed as per user request
+  tags:
+    - common
+  roles:
+    - common
+
+- name: Deploy Zookeeper Cluster
+  hosts: zookeeper
+  serial: 1
+  gather_facts: yes
+  vars_files:
+    - ../group_vars/all.yml
+    - ../group_vars/zookeeper.yml
+  tags: 
+    - zookeeper
+  roles:
+    - zookeeper
+
+- name: Deploy Kafka Cluster
+  hosts: kafka
+  serial: 1
+  vars_files:
+    - ../group_vars/all.yml
+    - ../group_vars/kafka.yml
+  tags: 
+    - kafka
+  roles:
+    - kafka

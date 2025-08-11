@@ -1,0 +1,3 @@
+---
+# Handlers removed - using conditional logic in tasks instead
+# This prevents duplicate executions and provides better control 

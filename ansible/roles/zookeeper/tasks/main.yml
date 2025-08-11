@@ -1,0 +1,121 @@
+---
+- name: Verify zookeeper group exists
+  group:
+    name: "{{ zookeeper_group }}"
+    state: present
+  check_mode: yes
+  register: zookeeper_group_check
+  failed_when: false
+
+- name: Verify zookeeper user exists
+  user:
+    name: "{{ zookeeper_user }}"
+    state: present
+  check_mode: yes
+  register: zookeeper_user_check
+  failed_when: false
+
+- name: Fail if zookeeper group does not exist
+  fail:
+    msg: "Group '{{ zookeeper_group }}' does not exist. Please ensure the group is created before running this playbook."
+  when: zookeeper_group_check.failed
+
+- name: Fail if zookeeper user does not exist
+  fail:
+    msg: "User '{{ zookeeper_user }}' does not exist. Please ensure the user is created before running this playbook."
+  when: zookeeper_user_check.failed
+
+- name: Create zookeeper directories
+  shell: sudo mkdir -p "{{ item }}" && sudo chown {{ zookeeper_user }}:{{ zookeeper_group }} "{{ item }}" && sudo chmod 755 "{{ item }}"
+  loop:
+    - "{{ zookeeper_home }}"
+    - "{{ zookeeper_data_dir }}"
+    - "{{ zookeeper_log_dir }}"
+  changed_when: false
+
+- name: Check if Zookeeper is already installed
+  stat:
+    path: "{{ zookeeper_home }}/bin/zkServer.sh"
+  register: zookeeper_installed
+
+- name: Download and extract Zookeeper
+  block:
+    - name: Download Zookeeper
+      get_url:
+        url: "{{ zookeeper_download_url }}"
+        dest: "{{ zookeeper_home }}/zookeeper-{{ zookeeper_version }}.tar.gz"
+        mode: '0644'
+
+    - name: Extract Zookeeper
+      unarchive:
+        src: "{{ zookeeper_home }}/zookeeper-{{ zookeeper_version }}.tar.gz"
+        dest: "{{ zookeeper_home }}"
+        owner: "{{ zookeeper_user }}"
+        group: "{{ zookeeper_group }}"
+        remote_src: yes
+        extra_opts: ["--strip-components=1"]
+        creates: "{{ zookeeper_home }}/bin"
+
+    - name: Remove Zookeeper archive file
+      file:
+        path: "{{ zookeeper_home }}/zookeeper-{{ zookeeper_version }}.tar.gz"
+        state: absent
+  when: not zookeeper_installed.stat.exists
+
+- name: Create zookeeper myid file
+  template:
+    src: myid.j2
+    dest: "{{ zookeeper_data_dir }}/myid"
+    mode: '0644'
+    owner: "{{ zookeeper_user }}"
+    group: "{{ zookeeper_group }}"
+  register: myid_changed
+
+- name: Create zookeeper configuration
+  template:
+    src: zoo.cfg.j2
+    dest: "{{ zookeeper_home }}/conf/zoo.cfg"
+    mode: '0644'
+    owner: "{{ zookeeper_user }}"
+    group: "{{ zookeeper_group }}"
+    backup: yes
+  register: zoo_cfg_changed
+
+- name: Create zookeeper systemd service template
+  template:
+    src: zookeeper.service.j2
+    dest: "{{ zookeeper_data_dir }}/zookeeper.service"
+    mode: '0644'
+
+- name: Check if systemd service file exists and compare
+  shell: |
+    if [ ! -f "{{ systemd_service_dir }}/zookeeper.service" ]; then
+      echo "new"
+    elif cmp -s "{{ zookeeper_data_dir }}/zookeeper.service" "{{ systemd_service_dir }}/zookeeper.service"; then
+      echo "same"
+    else
+      echo "changed"
+    fi
+  register: service_file_status
+  changed_when: false
+
+- name: Install zookeeper systemd service (if changed)
+  shell: sudo cp "{{ zookeeper_data_dir }}/zookeeper.service" "{{ systemd_service_dir }}/zookeeper.service" && sudo chmod 644 "{{ systemd_service_dir }}/zookeeper.service" && sudo chown root:root "{{ systemd_service_dir }}/zookeeper.service"
+  register: zookeeper_service_changed
+  when: service_file_status.stdout != "same"
+
+- name: Clean up temporary service file
+  shell: rm -f "{{ zookeeper_data_dir }}/zookeeper.service"
+
+- name: Reload systemd daemon
+  shell: sudo systemctl daemon-reload
+  when: zookeeper_service_changed.changed
+
+- name: Restart zookeeper service (if configuration changed)
+  shell: sudo systemctl restart zookeeper
+  when: myid_changed.changed or zoo_cfg_changed.changed or zookeeper_service_changed.changed
+
+- name: Start and enable zookeeper service
+  shell: sudo systemctl start zookeeper && sudo systemctl enable zookeeper
+  register: zookeeper_start_result
+  failed_when: zookeeper_start_result.rc not in [0, 1]

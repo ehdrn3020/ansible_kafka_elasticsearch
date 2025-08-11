@@ -1,0 +1,116 @@
+---
+- name: Verify kafka group exists
+  group:
+    name: "{{ kafka_group }}"
+    state: present
+  check_mode: yes
+  register: kafka_group_check
+  failed_when: false
+
+- name: Verify kafka user exists
+  user:
+    name: "{{ kafka_user }}"
+    state: present
+  check_mode: yes
+  register: kafka_user_check
+  failed_when: false
+
+- name: Fail if kafka group does not exist
+  fail:
+    msg: "Group '{{ kafka_group }}' does not exist. Please ensure the group is created before running this playbook."
+  when: kafka_group_check.failed
+
+- name: Fail if kafka user does not exist
+  fail:
+    msg: "User '{{ kafka_user }}' does not exist. Please ensure the user is created before running this playbook."
+  when: kafka_user_check.failed
+
+- name: Create kafka directories
+  shell: sudo mkdir -p "{{ item }}" && sudo chown {{ kafka_user }}:{{ kafka_group }} "{{ item }}" && sudo chmod 755 "{{ item }}"
+  loop:
+    - "{{ kafka_home }}"
+    - "{{ kafka_data_dir }}"
+    - "{{ kafka_log_dir }}"
+  changed_when: false
+
+- name: Check if Kafka is already installed
+  stat:
+    path: "{{ kafka_home }}/bin/kafka-server-start.sh"
+  register: kafka_installed
+
+- name: Download and extract Kafka
+  block:
+    - name: Download Kafka
+      get_url:
+        url: "{{ kafka_download_url }}"
+        dest: "{{ kafka_home }}/kafka-{{ kafka_version }}.tgz"
+        mode: '0644'
+
+    - name: Extract Kafka
+      unarchive:
+        src: "{{ kafka_home }}/kafka-{{ kafka_version }}.tgz"
+        dest: "{{ kafka_home }}"
+        owner: "{{ kafka_user }}"
+        group: "{{ kafka_group }}"
+        remote_src: yes
+        extra_opts: ["--strip-components=1"]
+        creates: "{{ kafka_home }}/bin"
+
+    - name: Remove Kafka archive file
+      file:
+        path: "{{ kafka_home }}/kafka-{{ kafka_version }}.tgz"
+        state: absent
+  when: not kafka_installed.stat.exists
+
+- name: Remove default Kafka configuration files
+  shell: sudo rm -f "{{ kafka_home }}/config/server.properties"
+  when: not kafka_installed.stat.exists
+
+- name: Create kafka configuration
+  template:
+    src: server.properties.j2
+    dest: "{{ kafka_home }}/config/server.properties"
+    mode: '0644'
+    owner: "{{ kafka_user }}"
+    group: "{{ kafka_group }}"
+    backup: yes
+  register: kafka_config_changed
+
+- name: Create kafka systemd service template
+  template:
+    src: kafka.service.j2
+    dest: "{{ kafka_data_dir }}/kafka.service"
+    mode: '0644'
+
+- name: Check if systemd service file exists and compare
+  shell: |
+    if [ ! -f "{{ systemd_service_dir }}/kafka.service" ]; then
+      echo "new"
+    elif cmp -s "{{ kafka_data_dir }}/kafka.service" "{{ systemd_service_dir }}/kafka.service"; then
+      echo "same"
+    else
+      echo "changed"
+    fi
+  register: service_file_status
+  changed_when: false
+
+- name: Install kafka systemd service (if changed)
+  shell: sudo cp "{{ kafka_data_dir }}/kafka.service" "{{ systemd_service_dir }}/kafka.service" && sudo chmod 644 "{{ systemd_service_dir }}/kafka.service" && sudo chown root:root "{{ systemd_service_dir }}/kafka.service"
+  register: kafka_service_changed
+  when: service_file_status.stdout != "same"
+
+- name: Clean up temporary service file
+  shell: rm -f "{{ kafka_data_dir }}/kafka.service"
+
+- name: Reload systemd daemon
+  shell: sudo systemctl daemon-reload
+  when: kafka_service_changed.changed
+
+- name: Restart kafka service (if configuration changed)
+  shell: sudo systemctl restart kafka
+  when: kafka_config_changed.changed or kafka_service_changed.changed
+
+- name: Start and enable kafka service
+  shell: sudo systemctl start kafka && sudo systemctl enable kafka
+  register: kafka_start_result
+  failed_when: kafka_start_result.rc not in [0, 1] 

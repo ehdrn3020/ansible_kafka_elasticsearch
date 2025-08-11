@@ -1,0 +1,24 @@
+[Unit]
+Description=Apache Zookeeper 3.6.0
+Documentation=http://zookeeper.apache.org
+Requires=network.target remote-fs.target
+After=network.target remote-fs.target
+
+[Service]
+Type=forking
+User={{ zookeeper_user }}
+Group={{ zookeeper_group }}
+Environment="JAVA_HOME={{ java_home }}"
+Environment="ZOO_LOG_DIR={{ log_dir }}/zookeeper"
+Environment="ZOOPIDFILE={{ data_dir }}/zookeeper/zookeeper_server.pid"
+Environment="SERVER_JVMFLAGS=-Xmx512m -Xms512m -XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35"
+ExecStart={{ zookeeper_home }}/bin/zkServer.sh start
+ExecStop={{ zookeeper_home }}/bin/zkServer.sh stop
+ExecReload={{ zookeeper_home }}/bin/zkServer.sh restart
+TimeoutSec=30
+Restart=on-failure
+RestartSec=2
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target 

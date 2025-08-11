@@ -1,0 +1,35 @@
+# ZooKeeper 3.8.4 Configuration
+# The number of milliseconds of each tick
+tickTime=2000
+
+# The number of ticks that the initial synchronization phase can take
+initLimit=10
+
+# The number of ticks that can pass between sending a request and getting an acknowledgement
+syncLimit=5
+
+# The directory where the snapshot is stored
+dataDir={{ data_dir }}/zookeeper
+
+# The directory where the transaction log is stored
+dataLogDir={{ log_dir }}/zookeeper
+
+# The port at which the clients will connect
+clientPort={{ zookeeper_client_port }}
+
+# Maximum number of connections and clients
+maxClientCnxns=60
+
+# Minimum session timeout in milliseconds
+minSessionTimeout=4000
+
+# Maximum session timeout in milliseconds
+maxSessionTimeout=30000
+
+# Admin server settings (disabled for security)
+admin.enableServer=false
+
+# Server list
+{% for host in groups['zookeeper'] %}
+server.{{ hostvars[host]['zookeeper_id'] }}={{ inventory_hostname }}:{{ zookeeper_peer_port }}:{{ zookeeper_leader_port }}
+{% endfor %} 

@@ -1,0 +1,28 @@
+[Unit]
+Description=Apache Kafka 3.7.0
+Documentation=http://kafka.apache.org
+Requires=network.target remote-fs.target zookeeper.service
+After=network.target remote-fs.target zookeeper.service
+Wants=zookeeper.service
+
+[Service]
+Type=simple
+User={{ kafka_user }}
+Group={{ kafka_group }}
+Environment="JAVA_HOME={{ java_home }}"
+Environment="KAFKA_HEAP_OPTS=-Xmx1g -Xms1g"
+Environment="KAFKA_LOG4J_OPTS=-Dkafka.logs.dir={{ log_dir }}/kafka"
+Environment="KAFKA_JVM_PERFORMANCE_OPTS=-XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:+ExplicitGCInvokesConcurrent -XX:MaxInlineLevel=15 -XX:+UnlockExperimentalVMOptions"
+{% if kafka_jmx_enabled | default(false) %}
+Environment="KAFKA_JMX_OPTS=-Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.port={{ kafka_jmx_port | default(9999) }}"
+{% endif %}
+ExecStart={{ kafka_home }}/bin/kafka-server-start.sh {{ kafka_home }}/config/server.properties
+ExecStop={{ kafka_home }}/bin/kafka-server-stop.sh
+TimeoutStartSec=120
+TimeoutStopSec=30
+Restart=on-failure
+RestartSec=2
+LimitNOFILE=100000
+
+[Install]
+WantedBy=multi-user.target 
