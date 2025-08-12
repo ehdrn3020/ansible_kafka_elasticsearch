@@ -59,6 +59,32 @@ CREATE TABLE PrintSink (
 SELECT * FROM Orders;
 ```
 
+## source / sink table
+```aiignore
+소스(Source) 테이블
+정의
+- 외부 시스템(파일, DB, 메시지 큐, HTTP API 등)로부터 데이터를 읽어오는 역할을 하는 테이블
+
+특징
+- SELECT 가능
+- INSERT 불가 (외부에서만 데이터 공급)
+- Flink SQL에서는 "connector" 속성이 해당 소스 타입을 지정
+- Orders는 datagen 커넥터를 사용한 소스 테이블
+
+
+싱크(Sink) 테이블
+정의
+- Flink 처리 결과를 외부 시스템(파일, DB, 메시지 큐, 콘솔 출력 등)에 내보내는 역할을 하는 테이블
+
+특징
+- INSERT 가능
+- SELECT 불가 (print, jdbc, filesystem 등 대부분이 그럼)
+- 결과는 테이블 자체에서 보이는 게 아니라 외부 대상(파일, 콘솔, 로그)에 기록됨
+- PrintSink는 싱크 전용
+- INSERT INTO PrintSink SELECT * FROM Orders; 가능
+- SELECT * FROM PrintSink; ❌ (불가)
+```
+
 ## tm 확인
 ```aiignore
 http://{public ip}:8081/#/overview
