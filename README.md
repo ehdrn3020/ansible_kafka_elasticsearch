@@ -1,6 +1,18 @@
 # ansible_kafka_elasticsearch
 ansible를 이용한 kafka, elasticsearch 배포
 
+#### Install Ansible
+```declarative
+sudo python3 -m pip install --upgrade pip && \
+sudo python3 -m pip install packaging &&
+sudo python3 -m pip install ansible==2.9.27
+
+# 설치 확인
+# 선택 .bash_profile 적용
+ansible --version
+또는 /usr/local/bin/ansible --version
+```
+
 #### Deploy Command
 ```
 # 공통 설정
