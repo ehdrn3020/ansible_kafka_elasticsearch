@@ -6,3 +6,14 @@ localhost
 
 [kafka]
 localhost
+
+[flink_master]
+flink-master-1 ansible_host=43.201.108.141
+
+[flink_workers]
+flink-worker-1 ansible_host=43.201.108.141
+#flink-worker-2 ansible_host=10.0.0.12
+
+[flink:children]
+flink_master
+flink_workers
