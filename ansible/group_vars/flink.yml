@@ -3,8 +3,8 @@
 # ==============================================
 
 # Infrastructure common settings
-flink_user: root
-flink_group: root
+flink_user: "root"
+flink_group: "root"
 
 # Common directories
 flink_home: "/rnd/flink"
