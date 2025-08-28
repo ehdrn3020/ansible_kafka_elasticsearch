@@ -1,0 +1,78 @@
+# ==============================================
+# Apache Flink Configuration
+# ==============================================
+
+{# --- 공통 계산값 --- #}
+{% set jm_host = groups['flink_masters'][0] %}
+{% set is_jm = inventory_hostname in groups['flink_masters'] %}
+
+# ==============================================
+# JobManager 설정
+# ==============================================
+jobmanager.rpc.address: {{ jm_host }}
+jobmanager.rpc.port: 6123
+jobmanager.bind-host: 0.0.0.0
+jobmanager.memory.process.size: 1600m
+
+# ==============================================
+# TaskManager 설정
+# ==============================================
+{% if not is_jm %}
+taskmanager.host: {{ inventory_hostname }}
+{% endif %}
+taskmanager.bind-host: 0.0.0.0
+taskmanager.memory.process.size: 1024m
+taskmanager.numberOfTaskSlots: 1
+
+# ==============================================
+# REST API 및 Web UI 설정
+# ==============================================
+rest.bind-address: 0.0.0.0
+rest.port: 8081
+{% if is_jm %}
+rest.address: {{ jm_host }}
+{% endif %}
+
+# ==============================================
+# 병렬 처리 설정
+# ==============================================
+parallelism.default: 1
+
+# ==============================================
+# 상태 백엔드 및 체크포인트 설정
+# ==============================================
+# RocksDB 상태 백엔드
+state.backend: rocksdb
+state.backend.rocksdb.localdir: {{ flink_rocksdb_dir }}
+state.backend.rocksdb.memory.managed: true
+state.backend.rocksdb.incremental: true
+
+# 체크포인트 설정
+state.checkpoints.dir: hdfs://{{ groups['flink_hdfs_namenode'][0] }}:9000/{{ flink_checkpoint_base }}
+state.savepoints.dir: hdfs://{{ groups['flink_hdfs_namenode'][0] }}:9000/{{ flink_savepoint_base }}
+state.checkpoints.num-retained: 2
+execution.checkpointing.interval: 60s
+execution.checkpointing.timeout: 5m
+execution.checkpointing.unaligned: true
+
+# ==============================================
+# 장애 복구 설정
+# ==============================================
+jobmanager.execution.failover-strategy: region
+
+# ==============================================
+# 고가용성 설정 (옵션)
+# ==============================================
+# high-availability.type: zookeeper
+# high-availability.storageDir: hdfs://{{ groups['flink_hdfs_namenode'][0] }}:9000/flink/ha
+# high-availability.zookeeper.quorum: zk1:2181,zk2:2181,zk3:2181
+# high-availability.zookeeper.path.root: /flink
+
+# ==============================================
+# 로깅 설정
+# ==============================================
+# rootLogger.level: INFO
+# logger.akka.level: WARN
+# logger.kafka.level: WARN
+# logger.hadoop.level: WARN
+# logger.zookeeper.level: WARN

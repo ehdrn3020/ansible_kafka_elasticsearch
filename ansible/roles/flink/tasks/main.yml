@@ -1,0 +1,136 @@
+---
+- name: Verify flink group exists
+  group:
+    name: "{{ flink_group }}"
+    state: present
+  check_mode: yes
+  register: flink_group_check
+  failed_when: false
+
+- name: Verify flink user exists
+  user:
+    name: "{{ flink_user }}"
+    state: present
+  check_mode: yes
+  register: flink_user_check
+  failed_when: false
+
+- name: Fail if flink group does not exist
+  fail:
+    msg: "Group '{{ flink_group }}' does not exist. Please ensure the group is created before running this playbook."
+  when: flink_group_check.failed
+
+- name: Fail if flink user does not exist
+  fail:
+    msg: "User '{{ flink_user }}' does not exist. Please ensure the user is created before running this playbook."
+  when: flink_user_check.failed
+
+- name: Create flink directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ flink_user }}"
+    group: "{{ flink_group }}"
+    mode: '0755'
+  loop:
+    - "{{ flink_home }}"
+    - "{{ flink_data_dir }}"
+    - "{{ flink_rocksdb_dir }}"
+
+- name: Check if Flink is already installed
+  stat:
+    path: "{{ flink_home }}/bin/start-cluster.sh"
+  register: flink_installed
+
+- name: Download and extract Flink
+  block:
+    - name: Download Flink
+      get_url:
+        url: "{{ flink_download_url }}"
+        dest: "{{ flink_home }}/flink-{{ flink_version }}.tgz"
+        mode: '0644'
+
+    - name: Extract Flink
+      unarchive:
+        src: "{{ flink_home }}/flink-{{ flink_version }}.tgz"
+        dest: "{{ flink_home }}"
+        owner: "{{ flink_user }}"
+        group: "{{ flink_group }}"
+        remote_src: yes
+        extra_opts: ["--strip-components=1"]
+        creates: "{{ flink_home }}/bin"
+
+    - name: Remove Flink archive file
+      file:
+        path: "{{ flink_home }}/flink-{{ flink_version }}.tgz"
+        state: absent
+  when: not flink_installed.stat.exists
+
+- name: Create flink configuration files
+  template:
+    src: flink-conf.yaml.j2
+    dest: "{{ flink_home }}/conf/flink-conf.yaml"
+    mode: '0644'
+    owner: "{{ flink_user }}"
+    group: "{{ flink_group }}"
+#    backup: yes
+  register: flink_conf_changed
+
+- name: Create flink masters files
+  template:
+    src: masters.j2
+    dest: "{{ flink_home }}/conf/masters"
+    mode: '0644'
+    owner: "{{ flink_user }}"
+    group: "{{ flink_group }}"
+  #    backup: yes
+  register: flink_conf_changed
+
+- name: Create flink workers files
+  template:
+    src: workers.j2
+    dest: "{{ flink_home }}/conf/workers"
+    mode: '0644'
+    owner: "{{ flink_user }}"
+    group: "{{ flink_group }}"
+  #    backup: yes
+  register: flink_conf_changed
+
+- name: Create flink systemd service template
+  template:
+    src: flink.service.j2
+    dest: "{{ flink_data_dir }}/flink.service"
+    mode: '0644'
+
+- name: Check if systemd service file exists and compare
+  shell: |
+    if [ ! -f "{{ systemd_service_dir }}/flink.service" ]; then
+      echo "new"
+    elif cmp -s "{{ flink_data_dir }}/flink.service" "{{ systemd_service_dir }}/flink.service"; then
+      echo "same"
+    else
+      echo "changed"
+    fi
+  register: flink_service_file_status
+  changed_when: false
+
+- name: Install flink systemd service (if changed)
+  shell: sudo cp "{{ flink_data_dir }}/flink.service" "{{ systemd_service_dir }}/flink.service" && sudo chmod 644 "{{ systemd_service_dir }}/flink.service" && sudo chown root:root "{{ systemd_service_dir }}/flink.service"
+  register: flink_service_changed
+  when: flink_service_file_status.stdout != "same"
+
+- name: Clean up temporary service file
+  shell: rm -f "{{ flink_data_dir }}/flink.service"
+
+- name: Reload systemd daemon
+  shell: sudo systemctl daemon-reload
+  when: flink_service_changed.changed
+
+- name: Restart flink service (if configuration changed)
+  shell: sudo systemctl restart flink
+  when: flink_conf_changed.changed or flink_service_changed.changed
+
+- name: Start and enable flink service
+  shell: sudo systemctl start flink && sudo systemctl enable flink
+  register: flink_start_result
+  failed_when: flink_start_result.rc not in [0, 1]

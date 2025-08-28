@@ -29,3 +29,13 @@
     - kafka
   roles:
     - kafka
+
+- name: Deploy Flink Cluster
+  hosts: flink
+  vars_files:
+    - ../group_vars/all.yml
+    - ../group_vars/flink.yml
+  tags:
+    - flink
+  roles:
+    - flink

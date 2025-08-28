@@ -6,3 +6,19 @@ localhost
 
 [kafka]
 localhost
+
+
+### [ flink 개발 환경 ] ###
+[flink_masters]
+server1
+
+[flink_workers]
+server3
+
+[flink_hdfs_namenode]
+server1
+server2
+
+[flink:children]
+flink_masters
+flink_workers

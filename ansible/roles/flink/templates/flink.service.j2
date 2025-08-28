@@ -1,0 +1,26 @@
+[Unit]
+Description=Apache Flink {{ 'JobManager' if (inventory_hostname in groups['flink_masters']) else 'TaskManager' }}
+After=network.target
+
+[Service]
+Type=simple
+User={{ flink_user }}
+Group={{ flink_group }}
+Environment=JAVA_HOME={{ java_home }}
+Environment=FLINK_HOME={{ flink_home }}
+Environment=FLINK_CONF_DIR={{ flink_home }}/conf
+WorkingDirectory={{ flink_home }}
+
+{% if inventory_hostname in groups['flink_masters'] %}
+# JM
+ExecStart={{ flink_home }}/bin/jobmanager.sh start-foreground
+{% else %}
+# TM
+ExecStart={{ flink_home }}/bin/taskmanager.sh start-foreground
+{% endif %}
+
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
