@@ -7,18 +7,13 @@ localhost
 [kafka]
 localhost
 
-
-### [ flink 개발 환경 ] ###
-[flink_masters]
-server1
+[flink_master]
+flink-master-1 ansible_host=172.31.0.206
 
 [flink_workers]
-server3
-
-[flink_hdfs_namenode]
-server1
-server2
+flink-worker-1 ansible_host=172.31.0.206
+#flink-worker-2 ansible_host=10.0.0.12
 
 [flink:children]
-flink_masters
+flink_master
 flink_workers
