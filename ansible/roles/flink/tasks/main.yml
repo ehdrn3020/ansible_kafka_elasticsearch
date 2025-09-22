@@ -46,14 +46,14 @@
   block:
     - name: Download Flink
       shell: >
-        wget -4 -O {{ flink_home }}/flink-{{ flink_version }}.tgz
+        wget -4 -O {{ flink_home }}/{{flink_download_file}}
         "{{ flink_download_url }}"
       args:
-        creates: "{{ flink_home }}/flink-{{ flink_version }}-bin-scala_2.12.tgz"
+        creates: "{{ flink_home }}/{{flink_download_file}}"
 
     - name: Extract Flink
       unarchive:
-        src: "{{ flink_home }}/flink-{{ flink_version }}.tgz"
+        src: "{{ flink_home }}/{{flink_download_file}}"
         dest: "{{ flink_home }}"
         owner: "{{ flink_user }}"
         group: "{{ flink_group }}"
@@ -63,7 +63,7 @@
 
     - name: Remove Flink archive file
       file:
-        path: "{{ flink_home }}/flink-{{ flink_version }}.tgz"
+        path: "{{ flink_home }}/{{flink_download_file}}"
         state: absent
   when: not flink_installed.stat.exists
 
