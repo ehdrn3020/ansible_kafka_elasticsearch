@@ -11,6 +11,7 @@ flink_home: "{{ base_dir }}/flink"
 flink_data_dir: "{{ base_dir }}/flink/data"
 flink_download_file: "flink-{{ flink_version }}-bin-scala_2.12.tgz"
 flink_download_url: "https://downloads.apache.org/flink/flink-{{ flink_version }}/{{flink_download_file}}"
+
 java_home: "/usr/lib/jvm/java-11-openjdk-amd64"
 systemd_service_dir: "/etc/systemd/system"
 
