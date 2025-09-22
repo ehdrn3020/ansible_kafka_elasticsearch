@@ -3,8 +3,8 @@
 # ==============================================
 
 flink_version: "1.18.1"
-flink_user: "root"
-flink_group: "root"
+flink_user: "ec2-user"
+flink_group: "ec2-user"
 
 base_dir: "/rnd"
 flink_home: "{{ base_dir }}/flink"
