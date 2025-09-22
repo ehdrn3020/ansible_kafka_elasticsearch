@@ -32,6 +32,8 @@
 
 - name: Deploy Flink Cluster
   hosts: flink
+  become: true
+  connection: ssh
   gather_facts: no
   serial: 1
   vars_files:
