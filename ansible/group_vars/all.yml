@@ -3,8 +3,8 @@
 # ==============================================
 
 # Infrastructure common settings
-ansible_user: "root"
-ansible_become: true
+#ansible_user: "root"
+#ansible_become: false
 
 # Common directories
 data_dir: "/rnd/data"    # 공통 데이터 디렉토리
