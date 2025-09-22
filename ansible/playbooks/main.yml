@@ -10,7 +10,6 @@
 - name: Deploy Zookeeper Cluster
   hosts: zookeeper
   serial: 1
-  gather_facts: yes
   vars_files:
     - ../group_vars/all.yml
     - ../group_vars/zookeeper.yml
@@ -32,11 +31,6 @@
 
 - name: Deploy Flink Cluster
   hosts: flink
-  become: true
-  connection: ssh
-  gather_facts: no
-  vars:
-    ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
   serial: 1
   vars_files:
     - ../group_vars/all.yml
