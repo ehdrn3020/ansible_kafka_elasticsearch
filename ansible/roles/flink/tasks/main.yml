@@ -104,7 +104,6 @@
     owner: root
     group: root
     mode: '0644'
-  become: true
 
 - name: Create flink systemd service template
   template:
