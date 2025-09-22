@@ -35,6 +35,8 @@
   become: true
   connection: ssh
   gather_facts: no
+  vars:
+    ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
   serial: 1
   vars_files:
     - ../group_vars/all.yml
