@@ -32,10 +32,6 @@
 
 - name: Deploy Flink Cluster
   hosts: flink
-  become: true
-  connection: ssh
-  vars:
-    ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
   serial: 1
   vars_files:
     - ../group_vars/all.yml
