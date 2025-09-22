@@ -49,7 +49,7 @@
         wget -4 -O {{ flink_home }}/flink-{{ flink_version }}.tgz
         "{{ flink_download_url }}"
       args:
-        creates: "{{ flink_home }}/flink-{{ flink_version }}.tgz"
+        creates: "{{ flink_home }}/flink-{{ flink_version }}-bin-scala_2.12.tgz"
 
     - name: Extract Flink
       unarchive:

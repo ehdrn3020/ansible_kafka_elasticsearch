@@ -9,8 +9,7 @@ flink_group: "root"
 base_dir: "/rnd"
 flink_home: "{{ base_dir }}/flink"
 flink_data_dir: "{{ base_dir }}/flink/data"
-flink_download_url: "https://archive.apache.org/dist/flink/flink-{{ flink_version }}/flink-{{ flink_version }}-bin-scala_2.12.tgz"
-
+flink_download_url: "https://downloads.apache.org/flink/flink-{{ flink_version }}/flink-{{ flink_version }}-bin-scala_2.12.tgz"
 java_home: "/usr/lib/jvm/java-11-openjdk-amd64"
 systemd_service_dir: "/etc/systemd/system"
 
