@@ -3,7 +3,7 @@
 # ==============================================
 
 # Infrastructure common settings
-ansible_user: "ec2-user"
+ansible_user: "root"
 ansible_become: false
 
 # Common directories
