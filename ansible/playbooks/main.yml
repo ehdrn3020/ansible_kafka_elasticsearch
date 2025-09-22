@@ -31,8 +31,6 @@
 
 - name: Deploy Flink Cluster
   hosts: flink
-#  become: true
-#  connection: ssh
   serial: 1
   vars_files:
     - ../group_vars/all.yml

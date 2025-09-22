@@ -97,16 +97,13 @@
   #    backup: yes
   register: flink_conf_changed
 
-- name: Deploy /etc/hosts for Flink cluster
-#  become: true
-  tasks:
-    - name: Replace /etc/hosts with template
-      template:
-        src: hosts.j2
-        dest: /etc/hosts
-        owner: root
-        group: root
-        mode: '0644'
+- name: Replace /etc/hosts with template
+  template:
+    src: hosts.j2
+    dest: /etc/hosts
+    owner: root
+    group: root
+    mode: '0644'
 
 - name: Create flink systemd service template
   template:
