@@ -2,10 +2,6 @@
 # 모든 그룹 공통 변수 (all.yml)
 # ==============================================
 
-# Infrastructure common settings
-#ansible_user: "root"
-#ansible_become: false
-
 # Common directories
 data_dir: "/rnd/data"    # 공통 데이터 디렉토리
 log_dir: "/rnd/logs"      # 공통 로그 디렉토리

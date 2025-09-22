@@ -45,10 +45,11 @@
 - name: Download and extract Flink
   block:
     - name: Download Flink
-      get_url:
-        url: "{{ flink_download_url }}"
-        dest: "{{ flink_home }}/flink-{{ flink_version }}.tgz"
-        mode: '0644'
+      shell: >
+        wget -4 -O {{ flink_home }}/flink-{{ flink_version }}.tgz
+        "{{ flink_download_url }}"
+      args:
+        creates: "{{ flink_home }}/flink-{{ flink_version }}.tgz"
 
     - name: Extract Flink
       unarchive:
