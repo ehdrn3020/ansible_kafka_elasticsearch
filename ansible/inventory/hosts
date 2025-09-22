@@ -11,7 +11,6 @@ localhost
 flink-master-1 ansible_host=172.31.0.206
 
 [flink_workers]
-flink-worker-1 ansible_host=172.31.0.206
 flink-worker-2 ansible_host=172.31.4.163
 
 [flink:children]
