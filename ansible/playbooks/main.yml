@@ -32,6 +32,7 @@
 
 - name: Deploy Flink Cluster
   hosts: flink
+  gather_facts: no
   serial: 1
   vars_files:
     - ../group_vars/all.yml
