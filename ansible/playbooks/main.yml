@@ -9,6 +9,7 @@
 
 - name: Deploy Zookeeper Cluster
   hosts: zookeeper
+  become: true
   serial: 1
   vars_files:
     - ../group_vars/all.yml
@@ -20,6 +21,7 @@
 
 - name: Deploy Kafka Cluster
   hosts: kafka
+  become: true
   serial: 1
   vars_files:
     - ../group_vars/all.yml

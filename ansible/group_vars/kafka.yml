@@ -14,8 +14,8 @@ kafka_download_url: "https://downloads.apache.org/kafka/{{ kafka_version }}/kafk
 kafka_port: 9092
 
 # Kafka user and group
-kafka_user: "ec2-user"
-kafka_group: "ec2-user"
+kafka_user: "root"
+kafka_group: "root"
 
 # Kafka cluster configuration
 kafka_log_dir: "{{ log_dir }}/kafka"
