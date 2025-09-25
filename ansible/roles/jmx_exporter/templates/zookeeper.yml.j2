@@ -1,0 +1,21 @@
+startDelaySeconds: 0
+lowercaseOutputName: true
+lowercaseOutputLabelNames: true
+
+rules:
+  - pattern: 'java.lang<type=Memory><HeapMemoryUsage>(\w+)'
+    name: jvm_memory_heap_$1
+    type: GAUGE
+    attrNameSnakeCase: true
+
+  - pattern: 'java.lang<type=GarbageCollector,name=(.+)><>(CollectionCount|CollectionTime)'
+    name: jvm_gc_$2
+    labels:
+      gc: "$1"
+    type: GAUGE
+
+  - pattern: 'org.apache.ZooKeeperService<name0=ReplicatedServer_id(\d+),name1=StandaloneServerPort><>(PacketsReceived|PacketsSent|OutstandingRequests)'
+    name: zookeeper_$2
+    labels:
+      server_id: "$1"
+    type: COUNTER

@@ -1,0 +1,26 @@
+---
+- name: Ensure JMX Exporter directory exists
+  file:
+    path: "{{ jmx_exporter_dir }}"
+    state: directory
+    owner: "{{ jmx_exporter_user }}"
+    group: "{{ jmx_exporter_group }}"
+    mode: '0755'
+
+- name: Download JMX Exporter jar
+  get_url:
+    url: "{{ download_url }}"
+    dest: "{{ jmx_exporter_dir }}/jmx_prometheus_javaagent-{{ jmx_exporter_version }}.jar"
+    mode: '0644'
+
+- name: Deploy zookeeper.yml
+  template:
+    src: zookeeper.yml.j2
+    dest: "{{ jmx_exporter_dir }}/zookeeper.yml"
+    mode: '0644'
+
+- name: Deploy kafka.yml
+  template:
+    src: kafka.yml.j2
+    dest: "{{ jmx_exporter_dir }}/kafka.yml"
+    mode: '0644'

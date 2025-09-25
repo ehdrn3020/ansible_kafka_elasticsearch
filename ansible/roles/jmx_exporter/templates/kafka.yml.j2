@@ -1,0 +1,33 @@
+startDelaySeconds: 0
+lowercaseOutputName: true
+lowercaseOutputLabelNames: true
+
+rules:
+  - pattern: 'java.lang<type=Memory><HeapMemoryUsage>(\w+)'
+    name: jvm_memory_heap_$1
+    type: GAUGE
+    attrNameSnakeCase: true
+
+  - pattern: 'java.lang<type=GarbageCollector,name=(.+)><>(CollectionCount|CollectionTime)'
+    name: jvm_gc_$2
+    labels:
+      gc: "$1"
+    type: GAUGE
+
+  - pattern: 'kafka.server<type=(.+), name=(.+)PerSec\w*><>Count'
+    name: kafka_$1_$2_total
+    type: COUNTER
+
+  - pattern: 'kafka.server<type=BrokerTopicMetrics, name=(BytesInPerSec|BytesOutPerSec)><>Count'
+    name: kafka_broker_$1_total
+    type: COUNTER
+
+  - pattern: 'kafka.network<type=RequestMetrics, name=RequestsPerSec, request=(.+)><>Count'
+    name: kafka_network_requests_total
+    labels:
+      request: "$1"
+    type: COUNTER
+
+  - pattern: 'kafka.server<type=ReplicaManager, name=UnderReplicatedPartitions><>Value'
+    name: kafka_under_replicated_partitions
+    type: GAUGE

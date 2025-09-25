@@ -1,0 +1,8 @@
+jmx_exporter_user: "root"
+jmx_exporter_group: "root"
+
+jmx_exporter_version: "1.0.1"
+jmx_exporter_dir: "/rnd/jmx_exporter"
+jmx_exporter_zookeeper_port: 9404
+jmx_exporter_kafka_port: 9405
+download_url : "https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/{{ jmx_exporter_version }}/jmx_prometheus_javaagent-{{ jmx_exporter_version }}.jar"
