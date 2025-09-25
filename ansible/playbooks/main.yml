@@ -7,6 +7,18 @@
   roles:
     - common
 
+- name: Deploy JMX Exporter
+  hosts: jmx_exporter
+  become: true
+  serial: 1
+  vars_files:
+    - ../group_vars/all.yml
+    - ../group_vars/jmx_exporter.yml
+  tags:
+    - jmx_exporter
+  roles:
+    - jmx_exporter
+
 - name: Deploy Zookeeper Cluster
   hosts: zookeeper
   become: true
@@ -44,15 +56,3 @@
     - flink
   roles:
     - flink
-
-- name: Deploy JMX Exporter
-  hosts: jmx_exporter
-  become: true
-  serial: 1
-  vars_files:
-    - ../group_vars/all.yml
-    - ../group_vars/jmx_exporter.yml
-  tags:
-    - jmx_exporter
-  roles:
-    - jmx_exporter
