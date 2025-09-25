@@ -13,6 +13,7 @@
   serial: 1
   vars_files:
     - ../group_vars/all.yml
+    - ../group_vars/jmx_exporter.yml
     - ../group_vars/zookeeper.yml
   tags: 
     - zookeeper
@@ -25,6 +26,7 @@
   serial: 1
   vars_files:
     - ../group_vars/all.yml
+    - ../group_vars/jmx_exporter.yml
     - ../group_vars/kafka.yml
   tags: 
     - kafka
