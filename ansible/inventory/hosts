@@ -2,10 +2,10 @@
 localhost zookeeper_id=1 kafka_broker_id=1 ansible_connection=local
 
 [zookeeper]
-zookeeper_1 zookeeper_id=1 ansible_host=172.31.0.206
+localhost zookeeper_id=1 ansible_host=172.31.0.206
 
 [kafka]
-kafka_1 kafka_broker_id=1 ansible_host=172.31.0.206
+localhost kafka_broker_id=1 ansible_host=172.31.0.206
 
 [jmx_exporter]
 jmx_exporter_1 ansible_host=172.31.0.206
