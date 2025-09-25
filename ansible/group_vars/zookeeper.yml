@@ -17,6 +17,6 @@ zookeeper_peer_port: 2888
 zookeeper_leader_port: 3888
 
 # Zookeeper user and group
-zookeeper_user: "ec2-user"
-zookeeper_group: "ec2-user"
+zookeeper_user: "root"
+zookeeper_group: "root"
 
