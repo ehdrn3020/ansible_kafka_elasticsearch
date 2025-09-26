@@ -13,14 +13,14 @@
     dest: "{{ jmx_exporter_dir }}/jmx_prometheus_javaagent-{{ jmx_exporter_version }}.jar"
     mode: '0644'
 
-- name: Deploy zookeeper.yml
+- name: Deploy Zookeeper config
   template:
     src: zookeeper.yml.j2
     dest: "{{ jmx_exporter_dir }}/zookeeper.yml"
-    mode: '0644'
+  when: "'zookeeper' in group_names"
 
-- name: Deploy kafka.yml
+- name: Deploy Kafka config
   template:
     src: kafka.yml.j2
     dest: "{{ jmx_exporter_dir }}/kafka.yml"
-    mode: '0644'
+  when: "'kafka' in group_names"
