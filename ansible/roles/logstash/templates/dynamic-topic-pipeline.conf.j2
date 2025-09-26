@@ -1,0 +1,30 @@
+input {
+  kafka {
+    bootstrap_servers => "{% for host in groups[logstash_host_group] %}{{ hostvars[host]['ansible_host'] }}:9092{% if not loop.last %},{% endif %}{% endfor %}"
+    topics => ["test-topic"]
+    group_id => "logstash-consumer-group"
+    consumer_threads => 2
+    auto_offset_reset => "latest"
+    enable_auto_commit => true
+    auto_commit_interval_ms => "5000"
+    fetch_max_wait_ms => "2000"
+    fetch_min_bytes => "1048576"
+    max_poll_records => "500"
+    codec => "plain"
+  }
+}
+
+filter {
+  grok {
+    match => {
+      "message" => "..구분자정의..."
+    }
+  }
+}
+
+output {
+  elasticsearch {
+    hosts => [{% for host in groups[elasticsearch_host_group] %}"{{ hostvars[host]['ansible_host'] }}:9200"{% if not loop.last %},{% endif %}{% endfor %}]
+    index => "%{log_name_lower}_%{indexDate}"
+  }
+} 

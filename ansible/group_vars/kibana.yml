@@ -1,0 +1,23 @@
+# ==============================================
+# Kibana 그룹 변수 (kibana.yml)
+# ==============================================
+
+# Kibana version and installation - 동일한 Elasticsearch 버전
+kibana_version: "7.17.29"
+kibana_home: "/rnd/kibana"
+kibana_data_dir: "{{ data_dir }}/kibana"
+kibana_log_dir: "{{ log_dir }}/kibana"
+
+# Kibana download URL
+kibana_download_url: "https://artifacts.elastic.co/downloads/kibana/kibana-{{ kibana_version }}-linux-x86_64.tar.gz"
+
+# Kibana network settings
+kibana_host: "0.0.0.0"
+kibana_port: 5601
+
+# Elasticsearch connection settings
+kibana_elasticsearch_hosts: "{{ groups[elasticsearch_host_group] | map('extract', hostvars, 'ansible_host') | map('regex_replace', '^(.*)$', 'http://\\1:9200') | list }}"
+
+# Kibana user and group
+kibana_user: "root"
+kibana_group: "root"

@@ -1,0 +1,22 @@
+# ==============================================
+# Elasticsearch 그룹 변수 (elasticsearch.yml)
+# ==============================================
+
+# Elasticsearch version and installation - Stable 7.17 LTS version
+elasticsearch_version: "7.17.29"
+elasticsearch_home: "/rnd/elasticsearch"
+elasticsearch_data_dir: "{{ data_dir }}/elasticsearch"
+elasticsearch_log_dir: "{{ log_dir }}/elasticsearch"
+
+# Elasticsearch download URL
+elasticsearch_download_url: "https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-{{ elasticsearch_version }}-linux-x86_64.tar.gz"
+
+# Elasticsearch cluster and network settings
+elasticsearch_cluster_name: "main-es-cluster"
+elasticsearch_network_host: "0.0.0.0"
+elasticsearch_http_port: 9200
+elasticsearch_transport_port: 9300
+
+# Elasticsearch user and group
+elasticsearch_user: "root"
+elasticsearch_group: "root"

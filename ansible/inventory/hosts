@@ -1,21 +1,28 @@
-[server_cluster]
-localhost zookeeper_id=1 kafka_broker_id=1 ansible_connection=local
+[zookeeper_host]
+server_1 zookeeper_id=1 ansible_host=172.31.0.206
 
-[zookeeper]
-localhost zookeeper_id=1 ansible_host=172.31.0.206
+[kafka_host]
+server_1 kafka_broker_id=1 ansible_host=172.31.0.206
 
-[kafka]
-localhost kafka_broker_id=1 ansible_host=172.31.0.206
+[logstash_host]
+server_1
 
-[jmx_exporter]
-jmx_exporter_1 ansible_host=172.31.0.206
+[kibana_host]
+server_1
 
-[flink_masters]
-flink-master-1 ansible_host=172.31.0.206
+[elasticsearch_host]
+server_1
 
-[flink_workers]
-flink-worker-2 ansible_host=172.31.4.163
+[jmx_exporter_host]
+server_1
 
-[flink:children]
+
+[flink_masters_host]
+server_1 ansible_host=172.31.0.206
+
+[flink_workers_host]
+server_2 ansible_host=172.31.4.163
+
+[flink_host:children]
 flink_masters
 flink_workers

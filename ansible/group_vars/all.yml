@@ -9,3 +9,10 @@ systemd_service_dir: "/etc/systemd/system"  # systemd 서비스 파일 디렉토
 
 # Java settings
 java_home: "/usr/lib/jvm/java-1.8.0-openjdk"
+
+# host group
+zookeeper_host_group: "zookeeper_host"
+kafka_host_group: "kafka_host"
+logstash_host_group: "logstash_host"
+elasticsearch_host_group: "elasticsearch_host"
+kibana_host_group: "kibana_host"

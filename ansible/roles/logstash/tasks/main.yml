@@ -1,0 +1,120 @@
+---
+- name: Verify logstash user and group exist
+  block:
+    - name: Check logstash group exists
+      group:
+        name: "{{ logstash_group }}"
+        state: present
+      check_mode: yes
+      register: logstash_group_check
+      failed_when: false
+
+    - name: Check logstash user exists  
+      user:
+        name: "{{ logstash_user }}"
+        state: present
+      check_mode: yes
+      register: logstash_user_check
+      failed_when: false
+
+    - name: Fail if prerequisites missing
+      fail:
+        msg: "{{ item.msg }}"
+      when: item.condition
+      loop:
+        - { msg: "Group '{{ logstash_group }}' does not exist", condition: "{{ logstash_group_check.failed }}" }
+        - { msg: "User '{{ logstash_user }}' does not exist", condition: "{{ logstash_user_check.failed }}" }
+
+- name: Create logstash directories
+  shell: sudo mkdir -p "{{ item }}" && sudo chown {{ logstash_user }}:{{ logstash_group }} "{{ item }}" && sudo chmod 755 "{{ item }}"
+  loop:
+    - "{{ logstash_home }}"
+    - "{{ logstash_config_dir }}"
+    - "{{ logstash_log_dir }}"
+    - "{{ logstash_data_dir }}"
+    - "{{ logstash_pipeline_dir }}"
+  changed_when: false
+
+- name: Check if Logstash is already installed
+  stat:
+    path: "{{ logstash_home }}/bin/logstash"
+  register: logstash_installed
+
+- name: Download and extract Logstash
+  block:
+    - name: Download Logstash
+      get_url:
+        url: "{{ logstash_download_url }}"
+        dest: "{{ logstash_home }}/logstash-{{ logstash_version }}.tar.gz"
+        mode: '0644'
+
+    - name: Extract Logstash
+      unarchive:
+        src: "{{ logstash_home }}/logstash-{{ logstash_version }}.tar.gz"
+        dest: "{{ logstash_home }}"
+        owner: "{{ logstash_user }}"
+        group: "{{ logstash_group }}"
+        remote_src: yes
+        extra_opts: ["--strip-components=1"]
+        creates: "{{ logstash_home }}/bin"
+
+    - name: Remove Logstash archive file
+      file:
+        path: "{{ logstash_home }}/logstash-{{ logstash_version }}.tar.gz"
+        state: absent
+  when: not logstash_installed.stat.exists
+
+- name: Configure Logstash
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ logstash_user }}"
+    group: "{{ logstash_group }}"
+    mode: '0644'
+#    backup: yes
+  loop:
+    - { src: "logstash.yml.j2", dest: "{{ logstash_config_dir }}/logstash.yml" }
+    - { src: "pipelines.yml.j2", dest: "{{ logstash_config_dir }}/pipelines.yml" }
+    - { src: "jvm.options.j2", dest: "{{ logstash_config_dir }}/jvm.options" }
+    - { src: "dynamic-topic-pipeline.conf.j2", dest: "{{ logstash_pipeline_dir }}/dynamic-topic-pipeline.conf" }
+  register: logstash_config_changed
+
+- name: Create systemd service template
+  template:
+    src: logstash.service.j2
+    dest: "{{ logstash_data_dir }}/logstash.service"
+    mode: '0644'
+
+- name: Check if systemd service file needs update
+  shell: |
+    if [ ! -f "/etc/systemd/system/logstash.service" ]; then
+      echo "new"
+    elif cmp -s "{{ logstash_data_dir }}/logstash.service" "/etc/systemd/system/logstash.service"; then
+      echo "same"
+    else
+      echo "changed"
+    fi
+  register: service_file_status
+  changed_when: false
+
+- name: Install systemd service (if changed)
+  shell: sudo cp "{{ logstash_data_dir }}/logstash.service" "/etc/systemd/system/logstash.service" && sudo chmod 644 "/etc/systemd/system/logstash.service"
+  register: logstash_service_changed
+  when: service_file_status.stdout != "same"
+
+- name: Clean up temporary service file
+  shell: rm -f "{{ logstash_data_dir }}/logstash.service"
+
+- name: Reload systemd and restart if needed
+  shell: |
+    sudo systemctl daemon-reload
+    {% if logstash_config_changed.changed or logstash_service_changed.changed %}
+    sudo systemctl daemon-reload
+    sudo systemctl restart logstash
+    {% endif %}
+  when: logstash_config_changed.changed or logstash_service_changed.changed
+
+- name: Start and enable Logstash service
+  shell: sudo systemctl start logstash && sudo systemctl enable logstash
+  register: logstash_start_result
+  failed_when: logstash_start_result.rc not in [0, 1]

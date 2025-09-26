@@ -24,3 +24,15 @@
     src: kafka.yml.j2
     dest: "{{ jmx_exporter_dir }}/kafka.yml"
   when: "'kafka' in group_names"
+
+- name: Deploy logstash config
+  template:
+    src: logstash.yml.j2
+    dest: "{{ jmx_exporter_dir }}/logstash.yml"
+  when: "'logstash' in group_names"
+
+- name: Deploy elasticsearch config
+  template:
+    src: logstash.yml.j2
+    dest: "{{ jmx_exporter_dir }}/elasticsearch.yml"
+  when: "'elasticsearch' in group_names"

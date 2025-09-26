@@ -1,0 +1,138 @@
+---
+- name: Verify elasticsearch group exists
+  group:
+    name: "{{ elasticsearch_group }}"
+    state: present
+  check_mode: yes
+  register: elasticsearch_group_check
+  failed_when: false
+
+- name: Verify elasticsearch user exists
+  user:
+    name: "{{ elasticsearch_user }}"
+    state: present
+  check_mode: yes
+  register: elasticsearch_user_check
+  failed_when: false
+
+- name: Fail if elasticsearch group does not exist
+  fail:
+    msg: "Group '{{ elasticsearch_group }}' does not exist. Please ensure the group is created before running this playbook."
+  when: elasticsearch_group_check.failed
+
+- name: Fail if elasticsearch user does not exist
+  fail:
+    msg: "User '{{ elasticsearch_user }}' does not exist. Please ensure the user is created before running this playbook."
+  when: elasticsearch_user_check.failed
+
+- name: Create elasticsearch directories
+  shell: sudo mkdir -p "{{ item }}" && sudo chown {{ elasticsearch_user }}:{{ elasticsearch_group }} "{{ item }}" && sudo chmod 755 "{{ item }}"
+  loop:
+    - "{{ elasticsearch_home }}"
+    - "{{ elasticsearch_data_dir }}"
+    - "{{ elasticsearch_log_dir }}"
+  changed_when: false
+
+- name: Check current vm.max_map_count setting
+  shell: sysctl vm.max_map_count
+  register: current_max_map_count
+  changed_when: false
+
+- name: Set vm.max_map_count for Elasticsearch (if too low)
+  shell: sudo sysctl -w vm.max_map_count=262144
+  when: current_max_map_count.stdout.split('=')[1] | trim | int < 262144
+
+- name: Make vm.max_map_count setting permanent (if changed)
+  shell: |
+    if ! grep -q "vm.max_map_count=262144" /etc/sysctl.conf; then
+      echo "vm.max_map_count=262144" | sudo tee -a /etc/sysctl.conf
+    fi
+  when: current_max_map_count.stdout.split('=')[1] | trim | int < 262144
+
+- name: Check if Elasticsearch is already installed
+  stat:
+    path: "{{ elasticsearch_home }}/bin/elasticsearch"
+  register: elasticsearch_installed
+
+- name: Download and extract Elasticsearch
+  block:
+    - name: Download Elasticsearch
+      get_url:
+        url: "{{ elasticsearch_download_url }}"
+        dest: "{{ elasticsearch_home }}/elasticsearch-{{ elasticsearch_version }}.tar.gz"
+        mode: '0644'
+
+    - name: Extract Elasticsearch
+      unarchive:
+        src: "{{ elasticsearch_home }}/elasticsearch-{{ elasticsearch_version }}.tar.gz"
+        dest: "{{ elasticsearch_home }}"
+        owner: "{{ elasticsearch_user }}"
+        group: "{{ elasticsearch_group }}"
+        remote_src: yes
+        extra_opts: ["--strip-components=1"]
+        creates: "{{ elasticsearch_home }}/bin"
+
+    - name: Remove Elasticsearch archive file
+      file:
+        path: "{{ elasticsearch_home }}/elasticsearch-{{ elasticsearch_version }}.tar.gz"
+        state: absent
+  when: not elasticsearch_installed.stat.exists
+
+- name: Create Elasticsearch configuration
+  template:
+    src: elasticsearch.yml.j2
+    dest: "{{ elasticsearch_home }}/config/elasticsearch.yml"
+    mode: '0644'
+    owner: "{{ elasticsearch_user }}"
+    group: "{{ elasticsearch_group }}"
+#    backup: yes
+  register: elasticsearch_yml_changed
+
+- name: Create Elasticsearch JVM options
+  template:
+    src: jvm.options.j2
+    dest: "{{ elasticsearch_home }}/config/jvm.options"
+    mode: '0644'
+    owner: "{{ elasticsearch_user }}"
+    group: "{{ elasticsearch_group }}"
+#    backup: yes
+  register: jvm_options_changed
+
+- name: Create elasticsearch systemd service template
+  template:
+    src: elasticsearch.service.j2
+    dest: "{{ elasticsearch_data_dir }}/elasticsearch.service"
+    mode: '0644'
+
+- name: Check if systemd service file exists and compare
+  shell: |
+    if [ ! -f "{{ systemd_service_dir }}/elasticsearch.service" ]; then
+      echo "new"
+    elif cmp -s "{{ elasticsearch_data_dir }}/elasticsearch.service" "{{ systemd_service_dir }}/elasticsearch.service"; then
+      echo "same"
+    else
+      echo "changed"
+    fi
+  register: service_file_status
+  changed_when: false
+
+- name: Install elasticsearch systemd service (if changed)
+  shell: sudo cp "{{ elasticsearch_data_dir }}/elasticsearch.service" "{{ systemd_service_dir }}/elasticsearch.service" && sudo chmod 644 "{{ systemd_service_dir }}/elasticsearch.service" && sudo chown root:root "{{ systemd_service_dir }}/elasticsearch.service"
+  register: elasticsearch_service_changed
+  when: service_file_status.stdout != "same"
+
+- name: Clean up temporary service file
+  shell: rm -f "{{ elasticsearch_data_dir }}/elasticsearch.service"
+
+- name: Reload systemd daemon
+  shell: sudo systemctl daemon-reload
+  when: elasticsearch_service_changed.changed
+
+- name: Restart elasticsearch service (if configuration changed)
+  shell: sudo systemctl restart elasticsearch
+  when: elasticsearch_yml_changed.changed or jvm_options_changed.changed or elasticsearch_service_changed.changed
+
+- name: Start and enable elasticsearch service
+  shell: sudo systemctl start elasticsearch && sudo systemctl enable elasticsearch
+  register: elasticsearch_start_result
+  failed_when: elasticsearch_start_result.rc not in [0, 1] 

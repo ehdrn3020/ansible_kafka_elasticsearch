@@ -1,0 +1,6 @@
+---
+- name: reload systemd
+  shell: sudo systemctl daemon-reload
+
+- name: restart elasticsearch
+  shell: sudo systemctl restart elasticsearch 

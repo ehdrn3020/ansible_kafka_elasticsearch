@@ -5,5 +5,8 @@ jmx_exporter_version: "1.0.1"
 jmx_exporter_dir: "/rnd/jmx_exporter"
 jmx_exporter_zookeeper_port: 9404
 jmx_exporter_kafka_port: 9405
+jmx_exporter_logstash_port: 9406
+jmx_exporter_elasticsearch_port: 9407
+jmx_exporter_flink_port: 9408
 jmx_exporter_file_name: "jmx_prometheus_javaagent-{{jmx_exporter_version}}.jar"
 download_url : "https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/{{ jmx_exporter_version }}/{{ jmx_exporter_file_name }}"

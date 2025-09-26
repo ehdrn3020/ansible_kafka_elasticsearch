@@ -1,0 +1,21 @@
+path.data: {{ logstash_data_dir }}
+path.logs: {{ logstash_log_dir }}
+path.settings: {{ logstash_config_dir }}
+
+# JVM Options
+node.name: "{{ inventory_hostname }}"
+
+# Monitoring
+{% if logstash_monitoring_enabled %}
+monitoring.enabled: true
+monitoring.elasticsearch.hosts: 
+{% for host in groups[elasticsearch_host_group] %}
+  - "{{ hostvars[host]['ansible_host'] }}:9200"
+{% endfor %}
+{% endif %}
+
+# API Settings
+api.enabled: true
+api.http.host: "0.0.0.0"
+api.http.port: {{ logstash_api_port }}
+api.environment: "production"

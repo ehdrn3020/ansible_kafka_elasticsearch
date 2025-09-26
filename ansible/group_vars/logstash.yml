@@ -1,0 +1,27 @@
+# ==============================================
+# Logstash 그룹 전용 변수 (logstash.yml)
+# ==============================================
+
+# Logstash version and installation
+logstash_version: "7.17.25"
+logstash_home: "/rnd/logstash"
+
+# Logstash download URL
+logstash_download_url: "https://artifacts.elastic.co/downloads/logstash/logstash-{{ logstash_version }}-linux-x86_64.tar.gz"
+
+# Logstash network settings
+logstash_api_port: 9600
+
+# Logstash user and group
+logstash_user: "root"
+logstash_group: "root"
+
+# Logstash cluster configuration
+logstash_log_dir: "{{ log_dir }}/logstash"
+logstash_data_dir: "{{ data_dir }}/logstash"
+logstash_config_dir: "{{ logstash_home }}/config"
+logstash_pipeline_dir: "{{ logstash_config_dir }}/pipeline"
+
+# Monitoring and debugging settings
+logstash_monitoring_enabled: true
+logstash_debug_output: false  # Enable for development only
