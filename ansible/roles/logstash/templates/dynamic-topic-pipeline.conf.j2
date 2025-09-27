@@ -1,6 +1,6 @@
 input {
   kafka {
-    bootstrap_servers => "{% for host in groups[kafka_group] %}{{ hostvars[host]['ansible_host'] }}:9092{% if not loop.last %},{% endif %}{% endfor %}"
+    bootstrap_servers => "{% for host in groups[logstash_host_group] %}{{ hostvars[host]['ansible_host'] }}:9092{% if not loop.last %},{% endif %}{% endfor %}"
     topics => ["test-topic"]
     group_id => "logstash-consumer-group"
     consumer_threads => 1 # 병렬 소비
