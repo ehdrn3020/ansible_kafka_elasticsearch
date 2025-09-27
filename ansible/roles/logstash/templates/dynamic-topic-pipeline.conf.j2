@@ -1,30 +1,35 @@
 input {
   kafka {
-    bootstrap_servers => "{% for host in groups[logstash_host_group] %}{{ hostvars[host]['ansible_host'] }}:9092{% if not loop.last %},{% endif %}{% endfor %}"
+    bootstrap_servers => "{% for host in groups[kafka_group] %}{{ hostvars[host]['ansible_host'] }}:9092{% if not loop.last %},{% endif %}{% endfor %}"
     topics => ["test-topic"]
     group_id => "logstash-consumer-group"
-    consumer_threads => 2
+    consumer_threads => 1 # 병렬 소비
+    codec => json
     auto_offset_reset => "latest"
-    enable_auto_commit => true
-    auto_commit_interval_ms => "5000"
-    fetch_max_wait_ms => "2000"
-    fetch_min_bytes => "1048576"
-    max_poll_records => "500"
-    codec => "plain"
   }
 }
 
 filter {
-  grok {
-    match => {
-      "message" => "..구분자정의..."
-    }
+  if ![id] or ![event_time] {
+    mutate { add_tag => ["_missing_required"] }
+    drop { }
+  }
+
+  date {
+    match  => ["event_time", "ISO8601", "yyyy-MM-dd HH:mm:ss.SSS", "yyyy-MM-dd'T'HH:mm:ss.SSSZ"]
+    target => "@timestamp"
+    timezone => "Asia/Seoul"
+    tag_on_failure => ["_date_parse_fail"]
   }
 }
 
 output {
+  stdout { codec => rubydebug } # 디버그
+
+  {% if logstash_monitoring_enabled %}
   elasticsearch {
-    hosts => [{% for host in groups[elasticsearch_host_group] %}"{{ hostvars[host]['ansible_host'] }}:9200"{% if not loop.last %},{% endif %}{% endfor %}]
-    index => "%{log_name_lower}_%{indexDate}"
+    hosts => [{% for host in groups[elasticsearch_host_group] %}"http://{{ hostvars[host]['ansible_host'] }}:9200"{% if not loop.last %}, {% endif %}{% endfor %}]
+    index => "test-json-events-%{+YYYY.MM.dd}"
   }
-} 
+  {% endif %}
+}

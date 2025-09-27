@@ -6,7 +6,7 @@
 # Main pipeline for dynamic topic processing
 - pipeline.id: main
   path.config: "{{ logstash_pipeline_dir }}/*.conf"
-  pipeline.workers: 2
+  pipeline.workers: 1
   pipeline.batch.size: 125
   pipeline.batch.delay: 1000
   queue.type: memory
