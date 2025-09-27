@@ -12,7 +12,7 @@ Environment=ES_HOME={{ elasticsearch_home }}
 Environment=ES_PATH_CONF={{ elasticsearch_home }}/config
 Environment=PID_DIR=/var/run/elasticsearch
 EnvironmentFile=-/etc/default/elasticsearch
-Environment="ES_JAVA_OPTS=-javaagent:{{ jmx_exporter_dir }}/{{ jmx_exporter_file_name }}={{ jmx_exporter_kafka_port }}:{{ jmx_exporter_dir }}/elasticsearch.yml"
+Environment="ES_JAVA_OPTS=-javaagent:{{ jmx_exporter_dir }}/{{ jmx_exporter_file_name }}={{ jmx_exporter_elasticsearch_port }}:{{ jmx_exporter_dir }}/elasticsearch.yml"
 
 WorkingDirectory={{ elasticsearch_home }}
 User={{ elasticsearch_user }}
