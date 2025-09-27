@@ -15,9 +15,6 @@ EnvironmentFile=-/etc/default/elasticsearch
 Environment="ES_JAVA_OPTS=-javaagent:{{ jmx_exporter_dir }}/{{ jmx_exporter_file_name }}={{ jmx_exporter_elasticsearch_port }}:{{ jmx_exporter_dir }}/elasticsearch.yml"
 
 WorkingDirectory={{ elasticsearch_home }}
-User={{ elasticsearch_user }}
-Group={{ elasticsearch_group }}
-
 ExecStart={{ elasticsearch_home }}/bin/elasticsearch
 StandardOutput=journal
 StandardError=inherit
