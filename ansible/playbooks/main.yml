@@ -71,18 +71,18 @@
   roles:
     - elasticsearch
 
-- name: Deploy Kibana Cluster
-  hosts: kibana_host
-  become: true
-  serial: 1
-  vars_files:
-    - ../group_vars/all.yml
-    - ../group_vars/jmx_exporter.yml
-    - ../group_vars/kibana.yml
-  tags:
-    - kibana
-  roles:
-    - kibana
+#- name: Deploy Kibana Cluster
+#  hosts: kibana_host
+#  become: true
+#  serial: 1
+#  vars_files:
+#    - ../group_vars/all.yml
+#    - ../group_vars/jmx_exporter.yml
+#    - ../group_vars/kibana.yml
+#  tags:
+#    - kibana
+#  roles:
+#    - kibana
 
 - name: Deploy Flink Cluster
   hosts: flink_host
