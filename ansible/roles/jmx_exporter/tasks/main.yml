@@ -31,8 +31,8 @@
     dest: "{{ jmx_exporter_dir }}/logstash.yml"
   when: "'logstash_host' in group_names"
 
-#- name: Deploy elasticsearch config
-#  template:
-#    src: logstash.yml.j2
-#    dest: "{{ jmx_exporter_dir }}/elasticsearch.yml"
-#  when: "'elasticsearch_host' in group_names"
+- name: Deploy elasticsearch config
+  template:
+    src: logstash.yml.j2
+    dest: "{{ jmx_exporter_dir }}/elasticsearch.yml"
+  when: "'elasticsearch_host' in group_names"

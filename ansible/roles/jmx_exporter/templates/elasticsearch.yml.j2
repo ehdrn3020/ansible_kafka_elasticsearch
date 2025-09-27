@@ -1,0 +1,19 @@
+startDelaySeconds: 0
+lowercaseOutputName: true
+lowercaseOutputLabelNames: true
+
+rules:
+  - pattern: 'java.lang<type=Memory><HeapMemoryUsage>(\w+)'
+    name: jvm_memory_heap_$1
+    type: GAUGE
+    attrNameSnakeCase: true
+
+  - pattern: 'java.lang<type=GarbageCollector,name=(.+)><>(CollectionCount|CollectionTime)'
+    name: jvm_gc_$2
+    labels:
+      gc: "$1"
+    type: GAUGE
+
+  - pattern: 'java.lang<type=Threading><>(PeakThreadCount|ThreadCount|DaemonThreadCount)'
+    name: jvm_threads_$1
+    type: GAUGE
