@@ -8,7 +8,7 @@ After=network.target remote-fs.target
 Type=simple
 User={{ logstash_user }}
 Group={{ logstash_group }}
-Environment="LS_JAVA_HOME={{ java_home }}"
+{#Environment="LS_JAVA_HOME={{ java_home }}"#}
 Environment="LS_HEAP_SIZE=1g"
 Environment="LS_JAVA_OPTS=-Dfile.encoding=UTF-8 -javaagent:{{ jmx_exporter_dir }}/{{ jmx_exporter_file_name }}={{ jmx_exporter_logstash_port }}:{{ jmx_exporter_dir }}/logstash.yml"
 ExecStart={{ logstash_home }}/bin/logstash --path.settings={{ logstash_config_dir }}
