@@ -16,8 +16,8 @@ Environment="ES_JAVA_OPTS=-javaagent:{{ jmx_exporter_dir }}/{{ jmx_exporter_file
 
 WorkingDirectory={{ elasticsearch_home }}
 ExecStart={{ elasticsearch_home }}/bin/elasticsearch
-User=ec2-user
-Group=ec2-user
+User={{ elasticsearch_user }}
+Group={{ elasticsearch_group }}
 StandardOutput=journal
 StandardError=inherit
 LimitNOFILE=65535
