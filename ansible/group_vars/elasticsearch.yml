@@ -18,5 +18,5 @@ elasticsearch_http_port: 9200
 elasticsearch_transport_port: 9300
 
 # Elasticsearch user and group
-elasticsearch_user: "root"
-elasticsearch_group: "root"
+elasticsearch_user: "elasticsearch"
+elasticsearch_group: "elasticsearch"
