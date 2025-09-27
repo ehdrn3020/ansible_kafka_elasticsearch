@@ -67,9 +67,9 @@
     - ../group_vars/jmx_exporter.yml
     - ../group_vars/elasticsearch.yml
   tags:
-    - kafka
+    - elasticsearch
   roles:
-    - kafka
+    - elasticsearch
 
 - name: Deploy Kibana Cluster
   hosts: kibana_host
@@ -80,9 +80,9 @@
     - ../group_vars/jmx_exporter.yml
     - ../group_vars/kibana.yml
   tags:
-    - kafka
+    - kibana
   roles:
-    - kafka
+    - kibana
 
 - name: Deploy Flink Cluster
   hosts: flink_host
