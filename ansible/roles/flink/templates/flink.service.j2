@@ -9,7 +9,8 @@ Group={{ flink_group }}
 Environment=JAVA_HOME={{ java_home }}
 Environment=FLINK_HOME={{ flink_home }}
 Environment=FLINK_CONF_DIR={{ flink_home }}/conf
-Environment="JAVA_OPTS=-javaagent:{{ jmx_exporter_dir }}/{{ jmx_exporter_file_name }}={{ jmx_exporter_flink_port }}:{{ jmx_exporter_dir }}/flink.yml"
+Environment="FLINK_ENV_JAVA_OPTS=-javaagent:{{ jmx_exporter_dir }}/{{ jmx_exporter_file_name }}={{ jmx_exporter_flink_port }}:{{ jmx_exporter_dir }}/flink.yml"
+
 WorkingDirectory={{ flink_home }}
 
 {% if inventory_hostname in groups['flink_masters_host'] %}
