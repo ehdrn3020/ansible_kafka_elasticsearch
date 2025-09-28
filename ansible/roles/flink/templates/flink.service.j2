@@ -1,5 +1,5 @@
 [Unit]
-Description=Apache Flink {{ 'JobManager' if (inventory_hostname in groups['flink_masters']) else 'TaskManager' }}
+Description=Apache Flink {{ 'JobManager' if (inventory_hostname in groups['flink_masters_host']) else 'TaskManager' }}
 After=network.target
 
 [Service]
@@ -12,7 +12,7 @@ Environment=FLINK_CONF_DIR={{ flink_home }}/conf
 Environment="JAVA_OPTS=-javaagent:{{ jmx_exporter_dir }}/{{ jmx_exporter_file_name }}={{ jmx_exporter_flink_port }}:{{ jmx_exporter_dir }}/flink.yml"
 WorkingDirectory={{ flink_home }}
 
-{% if inventory_hostname in groups['flink_masters'] %}
+{% if inventory_hostname in groups['flink_masters_host'] %}
 # JM
 ExecStart={{ flink_home }}/bin/jobmanager.sh start-foreground
 {% else %}
