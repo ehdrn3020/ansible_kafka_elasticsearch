@@ -10,7 +10,6 @@
 # JobManager 설정
 # ==============================================
 jobmanager.rpc.address: {{ jm_host }}
-jobmanager.hostname: {{ jm_host }}
 jobmanager.rpc.port: 6123
 jobmanager.bind-host: 0.0.0.0
 jobmanager.memory.process.size: 2g
@@ -77,3 +76,5 @@ jobmanager.execution.failover-strategy: region
 # logger.kafka.level: WARN
 # logger.hadoop.level: WARN
 # logger.zookeeper.level: WARN
+
+env.java.opts: -Djava.net.preferIPv4Stack=true
