@@ -18,7 +18,7 @@ jobmanager.memory.process.size: 2g
 # TaskManager 설정
 # ==============================================
 {% if not is_jm %}
-taskmanager.host: hostvars[host]['ansible_host']
+taskmanager.host: {{ hostvars[inventory_hostname]['ansible_host'] }}
 {% endif %}
 taskmanager.bind-host: 0.0.0.0
 taskmanager.memory.process.size: 4g
