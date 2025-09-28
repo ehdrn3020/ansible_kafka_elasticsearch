@@ -3,7 +3,7 @@
 # ==============================================
 
 {# --- 공통 계산값 --- #}
-{% set jm_host = hostvars[groups['flink_masters_host'][0]]['ansible_host'] %}
+{% set jm_host = groups['flink_masters_host'][0]['ansible_host'] %}
 {% set is_jm = inventory_hostname in groups['flink_masters_host'] %}
 
 # ==============================================
@@ -18,7 +18,7 @@ jobmanager.memory.process.size: 2g
 # TaskManager 설정
 # ==============================================
 {% if not is_jm %}
-taskmanager.host: {{ hostvars[inventory_hostname]['ansible_host'] }}
+taskmanager.host: {{inventory_hostname  }}
 {% endif %}
 taskmanager.bind-host: 0.0.0.0
 taskmanager.memory.process.size: 4g
@@ -48,8 +48,8 @@ parallelism.default: 1
 # state.backend.rocksdb.incremental: true
 
 # 체크포인트 설정
-# state.checkpoints.dir: hdfs://{{ jm_host }}:9000/{{ flink_checkpoint_base }}
-# state.savepoints.dir: hdfs://{{ jm_host }}:9000/{{ flink_savepoint_base }}
+# state.checkpoints.dir: hdfs://{{ groups['flink_masters_host'][0][ansible_host] }}:9000/{{ flink_checkpoint_base }}
+# state.savepoints.dir: hdfs://{{ groups['flink_masters_host'][0][ansible_host] }}:9000/{{ flink_savepoint_base }}
 # state.checkpoints.num-retained: 2
 # execution.checkpointing.interval: 60s
 # execution.checkpointing.timeout: 5m
@@ -64,7 +64,7 @@ jobmanager.execution.failover-strategy: region
 # 고가용성 설정 (옵션)
 # ==============================================
 # high-availability.type: zookeeper
-# high-availability.storageDir: hdfs://{{ jm_host }}:9000/flink/ha
+# high-availability.storageDir: hdfs://{{ groups['flink_masters_host'][0][ansible_host] }}:9000/flink/ha
 # high-availability.zookeeper.quorum: zk1:2181,zk2:2181,zk3:2181
 # high-availability.zookeeper.path.root: /flink
 
