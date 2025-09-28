@@ -4,7 +4,7 @@
 
 {# --- 공통 계산값 --- #}
 {% set jm_host = groups['flink_masters_host'][0] %}
-{% set is_jm = inventory_hostname in groups['flink_masters'] %}
+{% set is_jm = inventory_hostname in groups['flink_masters_host'] %}
 
 # ==============================================
 # JobManager 설정
