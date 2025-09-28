@@ -21,7 +21,6 @@ jobmanager.memory.process.size: 2g
 {% if not is_jm %}
 taskmanager.host: {{ inventory_hostname }}
 {% endif %}
-taskmanager.hostname: {{ inventory_hostname }}
 taskmanager.bind-host: 0.0.0.0
 taskmanager.memory.process.size: 4g
 taskmanager.numberOfTaskSlots: 2
