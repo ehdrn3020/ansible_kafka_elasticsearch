@@ -10,6 +10,7 @@
 # JobManager 설정
 # ==============================================
 jobmanager.rpc.address: {{ jm_host }}
+jobmanager.hostname: {{ jm_host }}
 jobmanager.rpc.port: 6123
 jobmanager.bind-host: 0.0.0.0
 jobmanager.memory.process.size: 2g
@@ -18,8 +19,9 @@ jobmanager.memory.process.size: 2g
 # TaskManager 설정
 # ==============================================
 {% if not is_jm %}
-taskmanager.host: {{inventory_hostname  }}
+taskmanager.host: {{ inventory_hostname }}
 {% endif %}
+taskmanager.hostname: {{ inventory_hostname }}
 taskmanager.bind-host: 0.0.0.0
 taskmanager.memory.process.size: 4g
 taskmanager.numberOfTaskSlots: 2
