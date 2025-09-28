@@ -14,8 +14,8 @@ server_1
 server_1
 
 [jmx_exporter_host]
-server_1
-
+172.31.0.206
+172.31.4.163
 
 [flink_masters_host]
 172.31.0.206
