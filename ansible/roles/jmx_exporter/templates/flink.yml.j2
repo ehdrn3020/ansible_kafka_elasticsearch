@@ -1,0 +1,30 @@
+---
+startDelaySeconds: 0
+hostPort: 0.0.0.0:9404
+ssl: false
+lowercaseOutputName: true
+lowercaseOutputLabelNames: true
+rules:
+  # JVM 메모리
+  - pattern: 'java.lang:type=Memory.*'
+
+  # Garbage Collector
+  - pattern: 'java.lang:name=(.*),type=GarbageCollector'
+    name: jvm_gc_$1
+
+  # 스레드
+  - pattern: 'java.lang:type=Threading.*'
+
+  # 클래스 로딩
+  - pattern: 'java.lang:type=ClassLoading.*'
+
+  # Flink Job/Task 메트릭 (taskmanager/jobmanager 공통)
+  - pattern: 'org.apache.flink.metrics<name=(.*),.*>'
+    name: flink_$1
+
+  # Flink Job/Task 메트릭 (TaskManager/JobManager 공통)
+  - pattern: 'org.apache.flink.taskmanager<name=(.*),.*>'
+    name: flink_taskmanager_$1
+
+  - pattern: 'org.apache.flink.jobmanager<name=(.*),.*>'
+    name: flink_jobmanager_$1

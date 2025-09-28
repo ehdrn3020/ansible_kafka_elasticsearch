@@ -25,14 +25,20 @@
     dest: "{{ jmx_exporter_dir }}/kafka.yml"
   when: "'kafka_host' in group_names"
 
-- name: Deploy logstash config
+- name: Deploy Logstash config
   template:
     src: logstash.yml.j2
     dest: "{{ jmx_exporter_dir }}/logstash.yml"
   when: "'logstash_host' in group_names"
 
-- name: Deploy elasticsearch config
+- name: Deploy Elasticsearch config
   template:
     src: logstash.yml.j2
     dest: "{{ jmx_exporter_dir }}/elasticsearch.yml"
   when: "'elasticsearch_host' in group_names"
+
+- name: Deploy Flink config
+  template:
+    src: flink.yml.j2
+    dest: "{{ jmx_exporter_dir }}/flink.yml"
+  when: "'flink_host' in group_names"
