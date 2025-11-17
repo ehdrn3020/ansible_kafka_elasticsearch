@@ -78,7 +78,6 @@
     mode: '0644'
     owner: "{{ zookeeper_user }}"
     group: "{{ zookeeper_group }}"
-    backup: yes
   register: zoo_cfg_changed
 
 - name: Create zookeeper systemd service template
