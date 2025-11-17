@@ -1,17 +1,21 @@
 [zookeeper_host]
-server_1 zookeeper_id=1 ansible_host=172.31.0.206
+server1 zookeeper_id=1 ansible_host=172.31.0.206
+server2 zookeeper_id=2 ansible_host=172.31.4.163
+server3 zookeeper_id=3 ansible_host=172.31.39.1
 
 [kafka_host]
-server_1 kafka_broker_id=1 ansible_host=172.31.0.206
+server1 kafka_broker_id=1 ansible_host=172.31.0.206
+server2 kafka_broker_id=2 ansible_host=172.31.4.163
+server3 kafka_broker_id=3 ansible_host=172.31.39.1
 
 [logstash_host]
-server_1
+server1
 
 [kibana_host]
-server_1
+server1
 
 [elasticsearch_host]
-server_1
+server1
 
 [jmx_exporter_host]
 172.31.0.206
