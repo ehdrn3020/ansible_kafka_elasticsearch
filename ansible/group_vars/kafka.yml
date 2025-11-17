@@ -18,8 +18,8 @@ kafka_user: "ec2-user"
 kafka_group: "ec2-user"
 
 # Kafka cluster configuration
-kafka_log_dir: "{{ kafka_home }}/kafka"
-kafka_data_dir: "{{ kafka_home }}/kafka"
+kafka_log_dir: "{{ kafka_home }}/logs"
+kafka_data_dir: "{{ kafka_home }}/data"
 
 # Kafka replication settings - Optimized for 3-node cluster
 kafka_default_replication_factor: 1
