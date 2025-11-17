@@ -5,21 +5,20 @@ Requires=network.target remote-fs.target
 After=network.target remote-fs.target
 
 [Service]
-Type=forking
+Type=simple
 User={{ zookeeper_user }}
 Group={{ zookeeper_group }}
+WorkingDirectory={{ zookeeper_home }}
 Environment="JAVA_HOME={{ java_home }}"
-{#Environment="ZOO_LOG_DIR={{ log_dir }}/zookeeper"#}
-{#Environment="ZOOPIDFILE={{ data_dir }}/zookeeper/zookeeper_server.pid"#}
-Environment="SERVER_JVMFLAGS=-Xmx512m -Xms512m -XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35"
-{#Environment="JVMFLAGS=-javaagent:{{ jmx_exporter_dir }}/{{ jmx_exporter_file_name }}={{ jmx_exporter_zookeeper_port }}:{{ jmx_exporter_dir }}/zookeeper.yml"#}
-ExecStart={{ zookeeper_home }}/bin/zkServer.sh start
-ExecStop={{ zookeeper_home }}/bin/zkServer.sh stop
-ExecReload={{ zookeeper_home }}/bin/zkServer.sh restart
-TimeoutSec=30
+Environment="ZOO_LOG_DIR={{ zookeeper_log_dir }}"
+Environment="SERVER_JVMFLAGS=-Xms512m -Xmx512m -XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35"
+# Environment="JVMFLAGS=-javaagent:{{ jmx_exporter_dir }}/{{ jmx_exporter_file_name }}={{ jmx_exporter_zookeeper_port }}:{{ jmx_exporter_dir }}/zookeeper.yml"
+
+ExecStart={{ zookeeper_home }}/bin/zkServer.sh start-foreground {{ zookeeper_home }}/conf/zoo.cfg
 Restart=on-failure
 RestartSec=2
+TimeoutSec=90
 LimitNOFILE=65536
 
 [Install]
-WantedBy=multi-user.target 
+WantedBy=multi-user.target
