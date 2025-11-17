@@ -31,5 +31,5 @@ admin.enableServer=false
 
 # Server list
 {% for host in groups['zookeeper_host'] %}
-server.{{ hostvars[host]['zookeeper_id'] }}={{ inventory_hostname }}:{{ zookeeper_peer_port }}:{{ zookeeper_leader_port }}
-{% endfor %} 
+server.{{ hostvars[host]['zookeeper_id'] }}={{ host }}:{{ zookeeper_peer_port }}:{{ zookeeper_leader_port }}
+{% endfor %}
