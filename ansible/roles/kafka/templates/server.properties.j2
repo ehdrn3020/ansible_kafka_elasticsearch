@@ -6,7 +6,7 @@ listeners=PLAINTEXT://{{ inventory_hostname }}:{{ kafka_port }}
 advertised.listeners=PLAINTEXT://{{ inventory_hostname }}:{{ kafka_port }}
 
 # Log Basics
-log.dirs={{ data_dir }}/kafka
+log.dirs={{ kafka_log_dir }}
 
 # Log Retention Policy
 log.retention.hours=72

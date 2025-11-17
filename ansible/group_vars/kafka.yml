@@ -18,8 +18,8 @@ kafka_user: "ec2-user"
 kafka_group: "ec2-user"
 
 # Kafka cluster configuration
-kafka_log_dir: "{{ log_dir }}/kafka"
-kafka_data_dir: "{{ data_dir }}/kafka"
+kafka_log_dir: "{{ kafka_home }}/kafka"
+kafka_data_dir: "{{ kafka_home }}/kafka"
 
 # Kafka replication settings - Optimized for 3-node cluster
 kafka_default_replication_factor: 1
@@ -27,9 +27,9 @@ kafka_min_insync_replicas: 1
 kafka_num_partitions: 1
 
 # JMX Settings - Enhanced monitoring for Kafka 3.7.0
-kafka_jmx_enabled: true
-#kafka_jmx_port: 9999
+kafka_jmx_enabled: false
+kafka_jmx_port: 9999
 
 # Zookeeper connection settings (for Kafka)
 zookeeper_client_port: 2181
-zookeeper_connect_path: "/Collector/SV/Kafka"
+zookeeper_connect_path: "/collector/kafka"
