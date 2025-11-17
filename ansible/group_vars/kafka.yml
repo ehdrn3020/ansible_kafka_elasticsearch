@@ -28,7 +28,7 @@ kafka_num_partitions: 1
 
 # JMX Settings - Enhanced monitoring for Kafka 3.7.0
 kafka_jmx_enabled: true
-kafka_jmx_port: 9999
+#kafka_jmx_port: 9999
 
 # Zookeeper connection settings (for Kafka)
 zookeeper_client_port: 2181
