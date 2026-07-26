@@ -1,5 +1,5 @@
 ---
-- name: Apply common configuration to all hosts
+- name: Apply common configuration to all hosts.ini
   hosts: kafka_host
   # become: yes # Removed as per user request
   tags:
@@ -72,7 +72,7 @@
     - elasticsearch
 
 #- name: Deploy Kibana Cluster
-#  hosts: kibana_host
+#  hosts.ini: kibana_host
 #  become: true
 #  serial: 1
 #  vars_files:
