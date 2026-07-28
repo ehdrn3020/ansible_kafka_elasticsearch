@@ -41,7 +41,7 @@ WAIT_INTERVAL_SECONDS=5
 
 ```text
 1) 재시작할 데이터 노드들을 입력하세요. ex) hostname_1 hostname_2 hostname_3
--> 입력값 : svlxstoragedn01 svlxstoragedn02
+-> 입력값 : hdhostdn01 hdhostdn02
 ```
 
 쉼표 구분은 사용하지 않는다. 공백으로만 구분한다.
@@ -92,7 +92,7 @@ ssh -o BatchMode=yes -o ConnectTimeout=3 k3@<host> "/hadoop/path/bin/hdfs dfsadm
 예시:
 
 ```bash
-ssh -o BatchMode=yes -o ConnectTimeout=3 k3@svlxstoragedn01 "/hadoop/path/bin/hdfs dfsadmin -shutdownDatanode svlxstoragedn01:9867"
+ssh -o BatchMode=yes -o ConnectTimeout=3 k3@hdhostdn01 "/hadoop/path/bin/hdfs dfsadmin -shutdownDatanode hdhostdn01:9867"
 ```
 
 ### DataNode start
