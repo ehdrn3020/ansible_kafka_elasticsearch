@@ -272,8 +272,8 @@ main()
             exit 1
         fi
 
-        log "${host}: DataNode rolling restart 완료"
-
+        log "${host}: DataNode restart 완료"
+        sleep 5
     done
 
     log "============================================================"
